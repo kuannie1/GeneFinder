@@ -57,13 +57,14 @@ def get_reverse_complement(dna):
     'AAAGCGGGCAT'
     >>> get_reverse_complement("CCGCGTTCA")
     'TGAACGCGG'
+    >>> get_reverse_complement("TGAACGCGGTAGCGTAC")
     """
+    #Uses get_complement to return the complimentary string
     direct_complement = ""
     need_way_to_reverse = ""
     for char in dna:
         t = get_complement(char)
         direct_complement = direct_complement + t
-    #HOW DO I DO REVERSE???
     for i in range(0, (len(direct_complement))):
         need_way_to_reverse = need_way_to_reverse + direct_complement[-1 - i]	
     return need_way_to_reverse
@@ -105,13 +106,9 @@ def rest_of_ORF(dna):
     dna_sequence = "".join(dna_sequence)
     if ((len(dna) % 3) != 0) and no_stop_codon:
     	return dna
-    
-#    elif ((len(dna) % 3) != 0) and not(no_stop_codon):
- #       return dna    
+
     else:
     	return dna_sequence
-    	
- 
 
 
 def find_all_ORFs_oneframe(dna):
@@ -128,7 +125,10 @@ def find_all_ORFs_oneframe(dna):
     ['ATGCATGAATGTAGA', 'ATGTGCCC']
     >>> find_all_ORFs_oneframe("ATGCATATGTGTAGATAGATGTGCCC")
     ['ATGCATATGTGTAGA', 'ATGTGCCC']
-
+    >>> find_all_ORFs_oneframe("ATGCATATGTGTAGAATGATGTGCCC")
+    ['ATGCATATGTGTAGAATGATGTGCCC']
+    >>> find_all_ORFs_oneframe("ATGCATTGAATGTGTAGATAAATG")
+    ['ATGCAT', 'ATGTGTAGA', 'ATG']
     """
     i = 0 #initial index condition
     group = [] 
@@ -160,14 +160,22 @@ def find_all_ORFs(dna):
 
     >>> find_all_ORFs("ATGCATGAATGTAG")
     ['ATGCATGAATGTAG', 'ATGAATGTAG', 'ATG']
+    >>> find_all_ORFs("ATGCGAATGTAGCATGAATGA")
+    ['ATGCGAATG', 'ATGAATGA', 'ATGA']
+    >>> find_all_ORFs("ATGCGATAAATGTAGCATGAATGA")
+    ['ATGCGA', 'ATG', 'ATGAATGA', 'ATGA']
     """
-   
+
     group = [] 
+#First possible frame- outputs a list & adds to 'group'
+    group = group + find_all_ORFs_oneframe(dna)
+    dna = dna[1:]										#deleting 1st character
+#second possible frame
     group = group + find_all_ORFs_oneframe(dna)
     dna = dna[1:]
+#third possible frame
     group = group + find_all_ORFs_oneframe(dna)
-    dna = dna[1:]
-    group = group + find_all_ORFs_oneframe(dna)
+#result!!!
     return group
     # TODO: implement this
     pass
@@ -181,17 +189,19 @@ def find_all_ORFs_both_strands(dna):
         returns: a list of non-nested ORFs
     >>> find_all_ORFs_both_strands("ATGCGAATGTAGCATCAAA")
     ['ATGCGAATG', 'ATGCTACATTCGCAT']
-    >>> 
+
     """
-    original = dna
+    original = dna #for naming convenience
     complement = get_reverse_complement(dna)
     group = []
+#Adds all possible starting points from original dna strand, using previous command
     group = group + find_all_ORFs(original)
+#Adds all possible starting points from complementary dna strand, using previous command
     group = group + find_all_ORFs(complement)
+#result!!!
     return group
     # TODO: implement this
     pass
-
 
 def longest_ORF(dna):
     """ Finds the longest ORF on both strands of the specified DNA and returns it
@@ -201,7 +211,6 @@ def longest_ORF(dna):
     """
     # TODO: implement this
     pass
-
 
 def longest_ORF_noncoding(dna, num_trials):
     """ Computes the maximum length of the longest ORF over num_trials shuffles
