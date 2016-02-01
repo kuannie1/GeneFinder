@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-YOUR HEADER COMMENT HERE
+gene_finder.py: compilation of functions
 
-@author: YOUR NAME HERE
+@author: Anne Ku
 
 """
 
@@ -29,8 +29,21 @@ def get_complement(nucleotide):
     'T'
     >>> get_complement('C')
     'G'
+    >>> get_complement('T')
+    'A'
+    >>> get_complement('G')
+    'C'
     """
-    # TODO: implement this
+    if (nucleotide == 'A'):
+        return 'T'
+    elif (nucleotide == 'T'):
+        return 'A'
+    elif (nucleotide == 'C'):
+        return 'G'
+    else:
+	    return 'C'
+
+    # TODO: implement this, remember to ctrl+B!!!
     pass
 
 
@@ -45,6 +58,15 @@ def get_reverse_complement(dna):
     >>> get_reverse_complement("CCGCGTTCA")
     'TGAACGCGG'
     """
+    direct_complement = ""
+    need_way_to_reverse = ""
+    for char in dna:
+        t = get_complement(char)
+        direct_complement = direct_complement + t
+    #HOW DO I DO REVERSE???
+    for i in range(0, (len(direct_complement))):
+        need_way_to_reverse = need_way_to_reverse + direct_complement[-1 - i]	
+    return need_way_to_reverse
     # TODO: implement this
     pass
 
@@ -57,13 +79,39 @@ def rest_of_ORF(dna):
 
         dna: a DNA sequence
         returns: the open reading frame represented as a string
-    >>> rest_of_ORF("ATGTGAA")
-    'ATG'
-    >>> rest_of_ORF("ATGAGATAGG")
+    >>> rest_of_ORF("ATGTATAAAA")
+    'ATGTATAAAA'
+    >>> rest_of_ORF("ATGAGATGAG")
     'ATGAGA'
     """
-    # TODO: implement this
-    pass
+    #Stop codons: TAG, TAA, and TGA
+    group = []
+    dna_sequence = []
+    last = (-1 * (len(dna) %3)) 
+    no_stop_codon = True
+#turned dna string into groups of 3 within a list
+    for i in range(int(len(dna)/3)):
+    	nucleotide = dna[3*i] + dna[3*i + 1] + dna[3*i + 2]
+    	group.append(nucleotide)
+#rules out the elements from the stop-codon until the end
+
+    for j in group:
+    	if (j != 'TGA') and (j != 'TAA') and (j != 'TAG'):
+    		dna_sequence.append(j)
+    	else:
+    	    no_stop_codon = False
+            break
+#combines all the happy nucleotides together for a great result:
+    dna_sequence = "".join(dna_sequence)
+    if ((len(dna) % 3) != 0) and no_stop_codon:
+    	return dna
+    
+#    elif ((len(dna) % 3) != 0) and not(no_stop_codon):
+ #       return dna    
+    else:
+    	return dna_sequence
+    	
+ 
 
 
 def find_all_ORFs_oneframe(dna):
@@ -78,7 +126,24 @@ def find_all_ORFs_oneframe(dna):
         returns: a list of non-nested ORFs
     >>> find_all_ORFs_oneframe("ATGCATGAATGTAGATAGATGTGCCC")
     ['ATGCATGAATGTAGA', 'ATGTGCCC']
+    >>> find_all_ORFs_oneframe("ATGCATATGTGTAGATAGATGTGCCC")
+    ['ATGCATATGTGTAGA', 'ATGTGCCC']
+
     """
+    i = 0 #initial index condition
+    group = [] 
+    while i < len(dna): #looping through dna
+    	codon = dna[i:i+3]
+    	if codon == "ATG": #checks to see if codon starts
+    		ORF_string = rest_of_ORF(dna[i:])
+    		group.append(ORF_string)
+    		i = len(ORF_string) + i
+    	else: #updates so it can start again, looks at the next codon
+    		i = i + 3
+    		
+    return group
+
+
     # TODO: implement this
     pass
 
@@ -96,6 +161,14 @@ def find_all_ORFs(dna):
     >>> find_all_ORFs("ATGCATGAATGTAG")
     ['ATGCATGAATGTAG', 'ATGAATGTAG', 'ATG']
     """
+   
+    group = [] 
+    group = group + find_all_ORFs_oneframe(dna)
+    dna = dna[1:]
+    group = group + find_all_ORFs_oneframe(dna)
+    dna = dna[1:]
+    group = group + find_all_ORFs_oneframe(dna)
+    return group
     # TODO: implement this
     pass
 
@@ -108,7 +181,14 @@ def find_all_ORFs_both_strands(dna):
         returns: a list of non-nested ORFs
     >>> find_all_ORFs_both_strands("ATGCGAATGTAGCATCAAA")
     ['ATGCGAATG', 'ATGCTACATTCGCAT']
+    >>> 
     """
+    original = dna
+    complement = get_reverse_complement(dna)
+    group = []
+    group = group + find_all_ORFs(original)
+    group = group + find_all_ORFs(complement)
+    return group
     # TODO: implement this
     pass
 
@@ -163,4 +243,5 @@ def gene_finder(dna):
 
 if __name__ == "__main__":
     import doctest
-    doctest.testmod()
+    #doctest.testmod()
+    doctest.run_docstring_examples(find_all_ORFs_both_strands, globals(), verbose = True)
