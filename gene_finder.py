@@ -268,6 +268,7 @@ def gene_finder(dna):
     ORFs_both_strands = find_all_ORFs_both_strands(dna)
     longer_than_threshold = []
     shorter_than_threshold = []
+
     for ORF in ORFs_both_strands:
 		if ORF > threshold:
 			longer_than_threshold.append(ORF) #The desired list!
@@ -281,5 +282,8 @@ def gene_finder(dna):
 
 if __name__ == "__main__":
     import doctest
+    from load import load_seq
+    dna = load_seq("./data/X73525.fa")
+    print gene_finder(dna)
     doctest.testmod()
     #doctest.run_docstring_examples(coding_strand_to_AA, globals(), verbose = True)
