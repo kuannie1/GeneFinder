@@ -207,9 +207,10 @@ def longest_ORF_noncoding(dna, num_trials):
     incrementing_trial = 0
     output_ORF = []
     while incrementing_trial < num_trials:
+    	dna = shuffle_string(dna)
     	ORF = longest_ORF(dna)
     	output_ORF.append(ORF) 
-    	dna = shuffle_string(dna)
+
     	incrementing_trial += 1
 
     #like before, this is for finding the longest ORF
@@ -217,7 +218,7 @@ def longest_ORF_noncoding(dna, num_trials):
     for ORF in output_ORF:
     	one_length = len(ORF)
     	ORF_lengths.append(one_length)
-    #locates longest ORF (self-explanatory)
+
     index_location = ORF_lengths.index(max(ORF_lengths))
 
     return output_ORF[index_location]
@@ -272,8 +273,9 @@ def gene_finder(dna):
     for ORF in ORFs_both_strands:
 		if ORF > threshold:
 			longer_than_threshold.append(ORF) #The desired list!
-		else:
-			shorter_than_threshold.append(ORF)
+
+
+
     for ORF in longer_than_threshold:
 		amino_acid_sequences.append(coding_strand_to_AA(ORF))
 
