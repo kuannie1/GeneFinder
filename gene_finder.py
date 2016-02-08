@@ -268,7 +268,6 @@ def gene_finder(dna):
 
     ORFs_both_strands = find_all_ORFs_both_strands(dna)
     longer_than_threshold = []
-    shorter_than_threshold = []
 
     for ORF in ORFs_both_strands:
 		if ORF > threshold:
